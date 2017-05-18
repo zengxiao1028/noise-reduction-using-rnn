@@ -12,7 +12,7 @@ import os, random
 
 #Function to sum the audio with the same length of noise
 def sum_audio(data, noise):
-	mix = np.add(0.75*data,0.25*noise)
+	mix = np.add(1*data,1*noise)
 	out = np.array(mix)
 	return out
 
@@ -35,15 +35,18 @@ traindir= os.getcwd()+"/Training/NoiseAdded/"
 noisedir= os.getcwd()+"/Noises"
 voicedir= os.getcwd()+"/Training/StrippedVoices/"
 
-whitenoise = "WhiteNoise.wav"
-brownnoise = "BrownianNoise.wav"
-pinknoise = "PinkNoise.wav"
+# whitenoise = "WhiteNoise.wav"
+# brownnoise = "BrownianNoise.wav"
+# pinknoise = "PinkNoise.wav"
+res_noise_file_1 = 'restaurant1.wav'
+res_noise_file_2 = 'restaurant2.wav'
+res_noise_file_3 = 'restaurant3.wav'
 
 filecount = 0
 
 #Extract the length of the noise file
 os.chdir(noisedir)
-temprate,tempdata = wav.read(whitenoise)
+temprate,tempdata = wav.read(res_noise_file_1)
 noiselen = len(tempdata)
 
 
@@ -61,8 +64,9 @@ for filename in os.listdir(wavsdir):
 		samplerate, samples = wav.read(filename)
 
 		# Use right channel only
-		right = samples[:,1]
-		voice = np.array(right)
+		#right = samples[:,1]
+
+		voice = np.array(samples)
 		
 
 		# Normalise voice samples
@@ -73,15 +77,20 @@ for filename in os.listdir(wavsdir):
 		
 		# Get Noises
 		os.chdir(noisedir)
-		sr_w, wnoise = wav.read(whitenoise)
-		sr_b, bnoise = wav.read(brownnoise)
-		sr_p, pnoise = wav.read(pinknoise)
+		noise_sr_1, res_noise_1 = wav.read(res_noise_file_1)
+		noise_sr_2, res_noise_2 = wav.read(res_noise_file_2)
+		noise_sr_3, res_noise_3 = wav.read(res_noise_file_3)
+
+		res_noise_1 = np.mean(res_noise_1, 1)
+		wav.write('noise.wave', noise_sr_1, res_noise_1.astype(np.int16))
+		res_noise_2 = np.mean(res_noise_2, 1)
+		res_noise_3 = np.mean(res_noise_3, 1)
 
 		# Create Mixtures:: Noises are pre-normalized to peak at 0dBFS
-		print "Summing "+filename+" with Noises"
-		mixture1 = np.array(sum_audio(voice_samples_normalized,trunc_len(wnoise, voice_samples_normalized)))
-		mixture2 = np.array(sum_audio(voice_samples_normalized,trunc_len(bnoise, voice_samples_normalized)))
-		mixture3 = np.array(sum_audio(voice_samples_normalized,trunc_len(pnoise, voice_samples_normalized)))
+		print("Summing "+filename+" with Noises")
+		mixture1 = np.array(sum_audio(voice_samples_normalized, trunc_len(res_noise_1, voice_samples_normalized)))
+		mixture2 = np.array(sum_audio(voice_samples_normalized, trunc_len(res_noise_2, voice_samples_normalized)))
+		mixture3 = np.array(sum_audio(voice_samples_normalized, trunc_len(res_noise_3, voice_samples_normalized)))
 			
 
 		# Write new file mixed with wnoise appended in the training directory
@@ -97,7 +106,7 @@ for filename in os.listdir(wavsdir):
 		
 
 		# Change back to wavs dir for next iteration
-		print "Finished Processing: "+filename
+		print("Finished Processing: "+filename)
 		os.chdir(wavsdir)
 
 
@@ -105,7 +114,7 @@ for filename in os.listdir(wavsdir):
 		filecount = filecount+1
 
 	
-print "Total Files Processed: " + str(filecount)
+print("Total Files Processed: " + str(filecount))
 
 
 

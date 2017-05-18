@@ -203,7 +203,7 @@ for each in range(batch_size):
 	result_spectrum = np.zeros([stft_size,time_vec[each]])
 	
 	commuted_spectrum = np.reshape(temp_spectrum,(stft_size,sequence_length*max_time_steps))
-	print commuted_spectrum.shape
+	print(commuted_spectrum.shape)
 
 	# for idx in range(max_time_steps):
 	# 	np.concatenate((commuted_spectrum,temp_spectrum[idx,:,:]),axis=1)
